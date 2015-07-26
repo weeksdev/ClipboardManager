@@ -28,8 +28,12 @@ namespace ClipboardAssist
 
         protected override void Dispose(bool disposing)
         {
-            if (nextClipboardViewer != null && nextClipboardViewer != IntPtr.Zero)
-                ChangeClipboardChain(this.Handle, nextClipboardViewer);
+            try
+            {
+                if (nextClipboardViewer != null && nextClipboardViewer != IntPtr.Zero)
+                    ChangeClipboardChain(this.Handle, nextClipboardViewer);
+            }
+            catch { }
         }
 
         [DllImport("User32.dll")]

@@ -44,7 +44,11 @@ namespace ClipboardManager
             icon.Visible = true;
             Monitor.ClipboardChanged += new EventHandler<ClipboardAssist.ClipboardChangedEventArgs>(delegate(object sender, ClipboardAssist.ClipboardChangedEventArgs e)
             {
-                ViewModel.AddToClipboardHistory(e.DataObject.GetData(typeof(string)));
+                var item = ViewModel.AddToClipboardHistory(e.DataObject.GetData(typeof(string)));
+                if (item != null)
+                {
+                    this.ClipboardGrid.ScrollIntoView(item);
+                }
             });
             this.StateChanged += new EventHandler(delegate(object o, EventArgs e)
             {
@@ -75,6 +79,18 @@ namespace ClipboardManager
         private void ClearHistoryBtn_Click(object sender, RoutedEventArgs e)
         {
             this.ViewModel.ClipboardHistory = new System.Collections.ObjectModel.ObservableCollection<viewmodel.Main.ClipboardItem>();
+        }
+
+        private void SaveSettingsBtn_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                this.ViewModel.SaveSettings();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show("Sorry, an error occured saving settings");
+            }
         }
     }
 }

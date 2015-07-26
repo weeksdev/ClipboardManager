@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
+using System.Configuration;
+using ClipboardManager;
 
 namespace ClipboardManager.viewmodel
 {
@@ -35,7 +37,7 @@ namespace ClipboardManager.viewmodel
                 OnPropertyChange();
             }
         }
-        public void AddToClipboardHistory(object value)
+        public ClipboardItem AddToClipboardHistory(object value)
         {
             if (value != null)
             {
@@ -50,8 +52,49 @@ namespace ClipboardManager.viewmodel
                     }
                 }
                 removeIndexes.ForEach(a => ClipboardHistory.RemoveAt(a));
-                ClipboardHistory.Add(new ClipboardItem() { Content = content });
+                var newClipboardItem = new ClipboardItem() { Content = content };
+                ClipboardHistory.Add(newClipboardItem);
+                UpdateHistoryLength();
+                return newClipboardItem;
             }
+            else
+            {
+                return null;
+            }
+        }
+        private int _MaxHistory = int.Parse(ConfigurationManager.AppSettings["maxHistory"]);
+        public int MaxHistory
+        {
+            get {
+                return _MaxHistory;
+            }
+            set {
+                _MaxHistory = value;
+                OnPropertyChange();
+            }
+        }
+        public void SaveSettings()
+        {
+            ConfigurationManager.AppSettings.Set("maxHistory", MaxHistory.ToString());
+            UpdateSetting("maxHistory", MaxHistory.ToString());   
+        }
+        public void UpdateHistoryLength()
+        {
+            var count = ClipboardHistory.Count;
+            if (count > MaxHistory)
+            {
+                //http://stackoverflow.com/questions/3453274/using-linq-to-get-the-last-n-elements-of-a-collection
+                //http://stackoverflow.com/questions/3559821/how-to-convert-ienumerable-to-observablecollection
+                ClipboardHistory = new ObservableCollection<ClipboardItem>(ClipboardHistory.Skip(Math.Max(0, ClipboardHistory.Count() - MaxHistory)));
+            }
+        }
+        private void UpdateSetting(string key, string value)
+        {
+            Configuration configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            configuration.AppSettings.Settings[key].Value = value;
+            configuration.Save();
+            ConfigurationManager.RefreshSection("appSettings");
+            UpdateHistoryLength();
         }
     }
 }

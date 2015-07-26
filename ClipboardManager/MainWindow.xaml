@@ -6,10 +6,15 @@
     <Controls:MetroWindow.RightWindowCommands>
         <Controls:WindowCommands>
             <Button Content="settings" Name="FlyoutOpen" Click="FlyoutOpen_Click"/>
+            <Menu>
+                <MenuItem Header="File" Style="{StaticResource MetroMenuItem}">
+                    <MenuItem Header="Export" Style="{StaticResource MetroMenuItem}"></MenuItem>
+                </MenuItem>
+            </Menu>
         </Controls:WindowCommands>
     </Controls:MetroWindow.RightWindowCommands>
     <Grid>
-        <DataGrid GridLinesVisibility="Horizontal" HeadersVisibility="None" Margin="0 0 0 0" ItemsSource="{Binding}" DataContext="{Binding Path=ClipboardHistory}" AutoGenerateColumns="False">
+        <DataGrid Name="ClipboardGrid" CanUserAddRows="False" GridLinesVisibility="Horizontal" HeadersVisibility="None" Margin="0 0 0 0" ItemsSource="{Binding}" DataContext="{Binding Path=ClipboardHistory}" AutoGenerateColumns="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Contents" Binding="{Binding Path=Content}" Width="*"/>
             </DataGrid.Columns>
@@ -20,7 +25,9 @@
             <Controls:Flyout Name="Flyout" Header="Settings" Position="Right" Width="200" Theme="Inverse" Padding="10 10 10 10">
                 <Grid>
                     <StackPanel>
-                        <TextBlock Margin="10">Oh, Hello.</TextBlock>
+                        <Label Content="Max History:" />
+                        <TextBox Name="MaxHistoryFld" Text="{Binding Path=MaxHistory, Mode=TwoWay}"/>
+                        <Button Margin="10" Height="25" Name="SaveSettingsBtn" Content="Save" Click="SaveSettingsBtn_Click"></Button>
                         <Button Margin="10" Height="25" Name="ClearHistoryBtn" Content="Clear History" Click="ClearHistoryBtn_Click"></Button>
                     </StackPanel>
                 </Grid>
