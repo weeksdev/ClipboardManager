@@ -6,11 +6,11 @@
     <Controls:MetroWindow.RightWindowCommands>
         <Controls:WindowCommands>
             <Button Content="settings" Name="FlyoutOpen" Click="FlyoutOpen_Click"/>
-            <Menu>
+            <!--<Menu>
                 <MenuItem Header="File" Style="{StaticResource MetroMenuItem}">
                     <MenuItem Header="Export" Style="{StaticResource MetroMenuItem}"></MenuItem>
                 </MenuItem>
-            </Menu>
+            </Menu>-->
         </Controls:WindowCommands>
     </Controls:MetroWindow.RightWindowCommands>
     <Grid>

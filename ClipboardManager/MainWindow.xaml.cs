@@ -25,11 +25,12 @@ namespace ClipboardManager
         public viewmodel.Main ViewModel = new viewmodel.Main();
         ClipboardAssist.ClipboardMonitor Monitor = new ClipboardAssist.ClipboardMonitor();
         NotifyIcon icon = new NotifyIcon();
-        
+        System.Windows.Forms.MenuItem copyMenuItems = new System.Windows.Forms.MenuItem("Recent");
         public MainWindow()
         {
             InitializeComponent();
             this.DataContext = ViewModel;
+            
             icon.ContextMenu = new System.Windows.Forms.ContextMenu(new System.Windows.Forms.MenuItem[]{
                 new System.Windows.Forms.MenuItem("Open", new EventHandler(delegate(object o, EventArgs e){
                     this.Show();
@@ -40,6 +41,8 @@ namespace ClipboardManager
                     this.Focus();         // important
                 }))
             });
+            icon.ContextMenu.MenuItems.Add("-");
+            icon.ContextMenu.MenuItems.Add(copyMenuItems);
             icon.Icon = new System.Drawing.Icon(@"C:\Users\WeeksDev\Downloads\Note29.ico");
             icon.Visible = true;
             Monitor.ClipboardChanged += new EventHandler<ClipboardAssist.ClipboardChangedEventArgs>(delegate(object sender, ClipboardAssist.ClipboardChangedEventArgs e)
@@ -49,6 +52,25 @@ namespace ClipboardManager
                 {
                     this.ClipboardGrid.ScrollIntoView(item);
                 }
+                copyMenuItems.MenuItems.Clear();
+                var l = Extensions.TakeLast(this.ViewModel.ClipboardHistory, 5);
+                l.ToList().ForEach(a =>
+                {
+                    var newMenuItem = new System.Windows.Forms.MenuItem();
+                    newMenuItem.Click += new EventHandler(delegate(object o, EventArgs args)
+                    {
+                        System.Windows.Clipboard.SetText(a.Content);
+                    });
+                    if (a.Content.Length > 50)
+                    {
+                        newMenuItem.Text = a.Content.Substring(0, 50) + "...";
+                    }
+                    else
+                    {
+                        newMenuItem.Text = a.Content;
+                    }
+                    copyMenuItems.MenuItems.Add(newMenuItem);
+                });
             });
             this.StateChanged += new EventHandler(delegate(object o, EventArgs e)
             {
