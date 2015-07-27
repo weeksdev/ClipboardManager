@@ -43,7 +43,7 @@ namespace ClipboardManager
             });
             icon.ContextMenu.MenuItems.Add("-");
             icon.ContextMenu.MenuItems.Add(copyMenuItems);
-            icon.Icon = new System.Drawing.Icon(@"C:\Users\WeeksDev\Downloads\Note29.ico");
+            icon.Icon = ClipboardManager.Properties.Resources.note29;
             icon.Visible = true;
             Monitor.ClipboardChanged += new EventHandler<ClipboardAssist.ClipboardChangedEventArgs>(delegate(object sender, ClipboardAssist.ClipboardChangedEventArgs e)
             {
