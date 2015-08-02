@@ -22,15 +22,30 @@ namespace ClipboardManager
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
+        /// <summary>
+        /// Backing viewmodel
+        /// </summary>
         public viewmodel.Main ViewModel = new viewmodel.Main();
+        /// <summary>
+        /// Clipboard assistant object, contains clipboard events
+        /// </summary>
         ClipboardAssist.ClipboardMonitor Monitor = new ClipboardAssist.ClipboardMonitor();
+        /// <summary>
+        /// Icon object for taskbar
+        /// </summary>
         NotifyIcon icon = new NotifyIcon();
+        /// <summary>
+        /// Copy menu items for recent on contextmenu for NotifyIcon
+        /// </summary>
         System.Windows.Forms.MenuItem copyMenuItems = new System.Windows.Forms.MenuItem("Recent");
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
             this.DataContext = ViewModel;
-            
+            //create basic context menu for taskbar including the open method for app
             icon.ContextMenu = new System.Windows.Forms.ContextMenu(new System.Windows.Forms.MenuItem[]{
                 new System.Windows.Forms.MenuItem("Open", new EventHandler(delegate(object o, EventArgs e){
                     this.Show();
@@ -41,10 +56,19 @@ namespace ClipboardManager
                     this.Focus();         // important
                 }))
             });
+            //add additional context menu items for NotifyIcon
             icon.ContextMenu.MenuItems.Add("-");
             icon.ContextMenu.MenuItems.Add(copyMenuItems);
-            icon.Icon = ClipboardManager.Properties.Resources.note29;
+            icon.ContextMenu.MenuItems.Add("-");
+            icon.ContextMenu.MenuItems.Add(new System.Windows.Forms.MenuItem("Exit", new EventHandler(delegate(object o, EventArgs e)
+            {
+                System.Environment.Exit(0);
+                icon.Visible = false;
+                icon = null;
+            })));
+            icon.Icon = ClipboardManager.Properties.Resources.clipboard;
             icon.Visible = true;
+            //handler for when the clipboard change, here we keep track of new items tossed in the clipboard.
             Monitor.ClipboardChanged += new EventHandler<ClipboardAssist.ClipboardChangedEventArgs>(delegate(object sender, ClipboardAssist.ClipboardChangedEventArgs e)
             {
                 var item = ViewModel.AddToClipboardHistory(e.DataObject.GetData(typeof(string)));
@@ -72,37 +96,38 @@ namespace ClipboardManager
                     copyMenuItems.MenuItems.Add(newMenuItem);
                 });
             });
-            this.StateChanged += new EventHandler(delegate(object o, EventArgs e)
-            {
-                if (this.WindowState == System.Windows.WindowState.Minimized)
-                {
-                    this.Hide();
-                    icon.ShowBalloonTip(2000, "Clipboard Manager Minimized.", "Clipboard Manager has been minimized to your system tray.", ToolTipIcon.Info);
-                }
-                else
-                {
-                    this.Show();
-                    this.Activate();
-                }
-            });
+            //instead of closing the app on close move it to the taskbar and just hide
             this.Closing += new System.ComponentModel.CancelEventHandler(delegate(object o, System.ComponentModel.CancelEventArgs e)
             {
-                icon.Visible = false;
-                icon = null;
+                this.Hide();
+                icon.ShowBalloonTip(2000, "Clipboard Manager Minimized.", "Clipboard Manager has been minimized to your system tray.", ToolTipIcon.Info);
+                e.Cancel = true;
             });
         }
-
-
+        /// <summary>
+        /// when the settings button is clicked open up the flyout
+        /// </summary>
+        /// <param name="sender">sender</param>
+        /// <param name="e">event</param>
         private void FlyoutOpen_Click(object sender, RoutedEventArgs e)
         {
             this.Flyout.IsOpen = true;
         }
-
+        /// <summary>
+        /// when clear history button is clicked go ahead and....do that
+        /// </summary>
+        /// <param name="sender">sender</param>
+        /// <param name="e">event</param>
         private void ClearHistoryBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.ViewModel.ClipboardHistory = new System.Collections.ObjectModel.ObservableCollection<viewmodel.Main.ClipboardItem>();
+            //reinstantiate the clipboard history in viewmodel to clear it
+            this.ViewModel.ClipboardHistory.Clear();
         }
-
+        /// <summary>
+        /// save settings on click
+        /// </summary>
+        /// <param name="sender">sender</param>
+        /// <param name="e">event</param>
         private void SaveSettingsBtn_Click(object sender, RoutedEventArgs e)
         {
             try

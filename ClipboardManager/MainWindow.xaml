@@ -16,7 +16,8 @@
     <Grid>
         <DataGrid Name="ClipboardGrid" CanUserAddRows="False" GridLinesVisibility="Horizontal" HeadersVisibility="None" Margin="0 0 0 0" ItemsSource="{Binding}" DataContext="{Binding Path=ClipboardHistory}" AutoGenerateColumns="False">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Contents" Binding="{Binding Path=Content}" Width="*"/>
+                <DataGridTextColumn Header="Contents" Binding="{Binding Path=Content}" Width="*">
+                </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

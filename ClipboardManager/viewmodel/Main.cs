@@ -42,20 +42,28 @@ namespace ClipboardManager.viewmodel
             if (value != null)
             {
                 var content = (string)value;
-                //iterate through history seeing if we already have this value if so remove it
-                var removeIndexes = new List<int>();
-                for (var i = 0; i < ClipboardHistory.Count; i++)
+                if (content != "")
                 {
-                    if (ClipboardHistory[i].Content == content)
+                    //iterate through history seeing if we already have this value if so remove it
+                    var removeIndexes = new List<int>();
+                    for (var i = 0; i < ClipboardHistory.Count; i++)
                     {
-                        removeIndexes.Add(i);
+                        if (ClipboardHistory[i].Content == content)
+                        {
+                            removeIndexes.Add(i);
+                        }
                     }
+                    removeIndexes.ForEach(a => ClipboardHistory.RemoveAt(a));
+                    //add the new content
+                    var newClipboardItem = new ClipboardItem() { Content = content };
+                    ClipboardHistory.Add(newClipboardItem);
+                    UpdateHistoryLength();
+                    return newClipboardItem;
                 }
-                removeIndexes.ForEach(a => ClipboardHistory.RemoveAt(a));
-                var newClipboardItem = new ClipboardItem() { Content = content };
-                ClipboardHistory.Add(newClipboardItem);
-                UpdateHistoryLength();
-                return newClipboardItem;
+                else
+                {
+                    return null;
+                }
             }
             else
             {
@@ -80,6 +88,7 @@ namespace ClipboardManager.viewmodel
         }
         public void UpdateHistoryLength()
         {
+            //if we're over the max history trim us down
             var count = ClipboardHistory.Count;
             if (count > MaxHistory)
             {
